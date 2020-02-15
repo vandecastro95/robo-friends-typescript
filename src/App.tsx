@@ -1,24 +1,50 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, useEffect, useContext } from 'react';
+import CardList from './components/CardList'
+import SearchBox from './components/SearchBox'
+import Scroll from './components/Scroll'
+import ErrorBoundary from './components/ErrorBoundary';
+import { RobotContext } from './contexts/RobotContexts'
+import 'tachyons'
+import './App.css'
 
-function App() {
+interface IAppProps {};
+
+export interface IRobot {
+  name: string;
+  username: string;
+  email: string;
+  id: number
+}
+
+const App: React.SFC<IAppProps> = () => {
+  
+
+  const { robotData, setSearchText, searchText } = useContext(RobotContext)
+
+  const onSearch = (event: string) => {
+    setSearchText(event)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="tc">
+    <h1 className='f1'>RoboFriends</h1>
+      <SearchBox 
+        onSearch={onSearch}
+      />
+      <Scroll>
+        <ErrorBoundary>
+          {robotData.length === 0 ? <h1>Loading...</h1> : 
+              <CardList 
+              data={
+                robotData.filter((robot: IRobot) => 
+                robot.name.toLowerCase().includes(searchText.toLowerCase()) || 
+                robot.username.toLowerCase().includes(searchText.toLowerCase()) || 
+                robot.email.toLowerCase().includes(searchText.toLowerCase()))
+              }
+            />
+          }
+        </ErrorBoundary> 
+      </Scroll>
     </div>
   );
 }
